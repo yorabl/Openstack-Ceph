@@ -9,7 +9,6 @@ from hosts import NovaHost
 import utils
 from sys import argv
 
-
 if __name__ == "__main__":
 
     delete_Pools = '--delete-pools' in argv
@@ -31,8 +30,7 @@ if __name__ == "__main__":
                 print 'You stupid, read help'
                 exit()
 
-    params = utils.getConfig(argv[1])
-
+    params = utils.get_config(argv[1])
 
     ceph_host = utils.check_ceph_host(params)
 
@@ -44,7 +42,7 @@ if __name__ == "__main__":
             Ceph.create_client(component)
 
     if Ceph.pools['glance'] == 'y':
-        glance_hosts = utils.findHostRole(params, 'glance')
+        glance_hosts = utils.find_host_role(params, 'glance')
         for node in glance_hosts:
             Glance = GlanceHost(params, node)
 
@@ -57,7 +55,7 @@ if __name__ == "__main__":
             Glance.reset_services('glance')
 
     if Ceph.pools['cinder'] == 'y':
-        cinder_hosts = utils.findHostRole(params, 'cinder')
+        cinder_hosts = utils.find_host_role(params, 'cinder')
         for node in cinder_hosts:
             Cinder = CinderHost(params, node)
 
@@ -69,7 +67,7 @@ if __name__ == "__main__":
             Cinder.set_cinder_conf()
             Cinder.reset_services('cinder')
 
-            nova_hosts = utils.findHostRole(params, 'nova')
+            nova_hosts = utils.find_host_role(params, 'nova')
 
             for node in nova_hosts:
                 print node
@@ -79,10 +77,9 @@ if __name__ == "__main__":
                 Nova.set_user_setting()
                 Nova.reset_services('nova')
 
-
     if Ceph.pools['cinder-backup'] == 'y':
 
-        backup_hosts = utils.findHostRole(params, 'cinder-backup')
+        backup_hosts = utils.find_host_role(params, 'cinder-backup')
 
         for node in backup_hosts:
             Backup = CinderBackupHost(params, node)
@@ -94,7 +91,7 @@ if __name__ == "__main__":
             Backup.set_cinder_backup_conf()
             Backup.reset_services('cinder')
 
-    nova_hosts = utils.findHostRole(params, 'nova')
+    nova_hosts = utils.find_host_role(params, 'nova')
 
     if Ceph.pools['nova'] == 'y':
         for node in nova_hosts:
