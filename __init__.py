@@ -39,6 +39,7 @@ if __name__ == "__main__":
         roles = argv[2:]
         Ceph.delete_pools(roles)
         exit()
+
     if reset_pools:
         roles = argv[2:]
         Ceph.reset_pools(roles)
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         for node in glance_hosts:
             Glance = GlanceHost(params, node)
 
-            for rpm in Glance.packages.split(',' ' '):
+            for rpm in Glance.parameters['packages'].split(',' ' '):
                 Glance.install_software(rpm)
 
             Glance.set_keyring(Ceph)
