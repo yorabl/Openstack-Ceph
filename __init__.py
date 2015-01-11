@@ -11,8 +11,8 @@ from sys import argv
 
 if __name__ == "__main__":
 
-    delete_Pools = '--delete-pools' in argv
-    reset_Pools = '--reset-pools' in argv
+    delete_pools = '--delete-pools' in argv
+    reset_pools = '--reset-pools' in argv
 
     if argv[0] == 'help' or len(argv) == 1:
         print "HELP!!"
@@ -23,7 +23,7 @@ if __name__ == "__main__":
             exit()
 
         elif len(argv) > 2:
-            if delete_Pools and reset_Pools:
+            if delete_pools and reset_pools:
                 print 'You stupid, read help'
                 exit()
             elif argv[2] != '--delete-pools' and argv[2] != '--reset-pools':
@@ -31,10 +31,18 @@ if __name__ == "__main__":
                 exit()
 
     params = utils.get_config(argv[1])
-
     ceph_host = utils.check_ceph_host(params)
 
     Ceph = CephHost(params, ceph_host[0])
+    if delete_pools:
+        # set-ceph --delete-pools [COMPONENTS]
+        roles = argv[2:]
+        Ceph.delete_pools(roles)
+        exit()
+    if reset_pools:
+        roles = argv[2:]
+        Ceph.reset_pools(roles)
+
     Ceph.create_pools()
 
     for component in Ceph.pools:

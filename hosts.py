@@ -62,6 +62,29 @@ class CephHost(Host):
                       'cinder-backup': params.get('DEFAULT', 'set_cinder_backup'),
                       'nova': params.get('DEFAULT', 'set_nova')}
 
+    def delete_pools(self, roles):
+
+        self.open_ssh_connection()
+
+        if roles is 'all':
+            components = ['cinder', 'glance', 'nova']
+
+            for component in components:
+
+                cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
+                      (self.parameters['user'], component, self.parameters['user'], component)
+                print "%s-%s has been deleted" % (self.parameters['user'], component)
+        else:
+            for role in roles:
+
+                cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
+                    (self.parameters['user'], role, self.parameters['user'], role)
+                print "%s-%s has been deleted" % (self.parameters['user'],  role)
+
+    def reset_pools(self, roles):
+        self.delete_pools(roles)
+        self.create_pools()
+
     def create_pools(self):
         self.open_ssh_connection()
 
