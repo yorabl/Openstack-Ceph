@@ -67,7 +67,7 @@ class CephHost(Host):
         self.open_ssh_connection()
 
         if 'all' in roles:
-            components = ['cinder', 'cinder-backup', 'glance', 'nova']
+            components = ['cinder', 'cinder-backup  ', 'glance', 'nova']
 
             for component in components:
 
