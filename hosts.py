@@ -73,13 +73,19 @@ class CephHost(Host):
 
                 cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
                       (self.parameters['user'], component, self.parameters['user'], component)
+                self.run_bash_command(cmd)
+
                 print "%s-%s has been deleted" % (self.parameters['user'], component)
         else:
             for role in roles:
 
                 cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
                     (self.parameters['user'], role, self.parameters['user'], role)
+                self.run_bash_command(cmd)
+
                 print "%s-%s has been deleted" % (self.parameters['user'],  role)
+
+        self.close_ssh_connection()
 
     def reset_pools(self, roles):
         self.delete_pools(roles)
