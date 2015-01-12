@@ -309,6 +309,7 @@ class CinderHost(Host):
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
                            'rbd_flatten_volume_from_snapshot',
                            self.parameters['rbd_flatten_volume_from_snapshot'])
+
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
                            'rbd_max_clone_depth', self.parameters['rbd_max_clone_depth'])
 

@@ -29,3 +29,11 @@ def check_ceph_host(params):
         exit()
     else:
         return ceph_host
+
+def print_help():
+    help = "usage: set-ceph.py \t\t[<configuration file>]\n" \
+           "\t\t[--delete--pools <component> <component>...]\n" \
+           "\t\t[--reset-pools]" \
+           "Optional arguments: \n" \
+           "\t --delete--pools <component>...\n" \
+           "\t --reset-pools"
