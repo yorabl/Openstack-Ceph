@@ -52,6 +52,15 @@ class Host(object):
         self.close_ssh_connection()
         print "Restarting the %s services" % component
 
+    def set_parameter(self, conf_file, section, parameter, value):
+        self.open_ssh_connection()
+
+        cmd = "crudini --set %s %s %s %s" % \
+              (conf_file, section, parameter, value)
+        self.run_bash_command(cmd)
+
+        self.close_ssh_connection()
+
 
 class CephHost(Host):
     def __init__(self, params, hostname):
@@ -171,6 +180,7 @@ class CephHost(Host):
 class GlanceHost(Host):
     def __init__(self, params, hostname):
         Host.__init__(self, params, hostname)
+        self.parameters['conf_path'] = params.get('GLANCE', 'conf_file')
         self.parameters['store'] = params.get('GLANCE', 'store')
         self.parameters['stores'] = params.get("GLANCE", 'stores')
         self.parameters['section'] = params.get("GLANCE", 'stores_section')
@@ -210,49 +220,34 @@ class GlanceHost(Host):
         print "The Ceph configuration file has been set in the Glance host"
 
     def set_glance_conf(self):
-        self.open_ssh_connection()
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s default_store %s" % \
-              ("DEFAULT", self.parameters['store'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'default_store', self.parameters['store'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s show_image_direct_url %s" % \
-              ("DEFAULT", self.parameters['show_direct_url'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'show_image_direct_url', self.parameters['show_direct_url'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s enable_v1_api %s" % \
-              ("DEFAULT", self.parameters['enable_v1_api'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'enable_v1_api', self.parameters['enable_v1_api'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s enable_v2_api %s" % \
-              ("DEFAULT", self.parameters['enable_v2_api'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'enable_v2_api', self.parameters['enable_v2_api'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s stores %s" % \
-              (self.parameters['section'], self.parameters['stores'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'stores', self.parameters['stores'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s rbd_store_pool %s-glance" % \
-              (self.parameters['section'], self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'rbd_store_pool', '%s' % self.parameters['user'] + '-glance')
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s rbd_store_user %s-glance" % \
-              (self.parameters['section'], self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'rbd_store_ceph_conf', self.parameters['ceph.conf path'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s rbd_store_ceph_conf %s" % \
-              (self.parameters['section'], self.parameters['ceph.conf path'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'rbd_store_chunk_size', self.parameters['rbd_store_chunk_size'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s rbd_store_chunk_size %s " % \
-              (self.parameters['section'], self.parameters['chunk_size'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'stores', "\" %s \"" % self.parameters['stores'])
 
-        cmd = "crudini --set /etc/glance/glance-api.conf %s stores \"%s \"" % \
-              (self.parameters['section'], self.parameters['stores'])
-        self.run_bash_command(cmd)
-
-        self.close_ssh_connection()
         print "The Glance configuration has been changed"
 
 
@@ -295,53 +290,40 @@ class CinderHost(Host):
         print "The Ceph configuration file has been set"
 
     def set_cinder_conf(self):
-        self.open_ssh_connection()
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s enabled_backends %s" % \
-              ("DEFAULT", self.parameters['backend_name'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'enabled_backends', self.parameters['backend_name'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s glance_api_version %s" % \
-              ("DEFAULT", self.parameters['glance_client_api'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'glance_api_version', self.parameters['glance_client_api'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s volume_driver %s" % \
-              (self.parameters['backend_name'], self.parameters['driver'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'volume_driver', self.parameters['driver'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_pool %s-cinder" % \
-              (self.parameters['section'], self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_pool', '%s-' % (self.parameters['user']) + 'cinder')
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_ceph_conf %s" % \
-              (self.parameters['section'], self.parameters['ceph.conf path'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_ceph_conf', self.parameters['ceph.conf path'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_flatten_volume_from_snapshot %s" % \
-              (self.parameters['section'], self.parameters['rbd_flatten_volume_from_snapshot'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_flatten_volume_from_snapshot',
+                           self.parameters['rbd_flatten_volume_from_snapshot'])
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_max_clone_depth', self.parameters['rbd_max_clone_depth'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_max_clone_depth %s" % \
-              (self.parameters['section'], self.parameters['rbd_max_clone_depth'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_store_chunk_size', self.parameters['rbd_store_chunk_size'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_store_chunk_size %s" % \
-              (self.parameters['section'], self.parameters['rbd_store_chunk_size'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rados_connect_timeout', self.parameters['rados_connect_timeout'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rados_connect_timeout %s" % \
-              (self.parameters['section'], self.parameters['rados_connect_timeout'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_user', '%s-' % (self.parameters['user']) + 'cinder')
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_user %s-cinder" % \
-              (self.parameters['section'], self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'rbd_secret_uuid', self.parameters['uuid'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s rbd_secret_uuid %s-cinder" % \
-              (self.parameters['section'], self.parameters['uuid'])
-        self.run_bash_command(cmd)
-
-        self.close_ssh_connection()
         print "The Cinder configuration has been changed"
 
 
@@ -379,29 +361,22 @@ class CinderBackupHost(Host):
         print "The Ceph configuration file has been set"
 
     def set_cinder_backup_conf(self):
-        self.open_ssh_connection()
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s backup_driver %s" % \
-              ("DEFAULT", self.parameters['backup_driver'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_driver', self.parameters['backup_driver'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s backup_ceph_chunk_size %s" % \
-              ("DEFAULT", self.parameters['backup_ceph_chunk_size'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_ceph_chunk_size', self.parameters['backup_ceph_chunk_size'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s backup_ceph_stripe_unit %s" % \
-              ("DEFAULT", self.parameters['backup_ceph_stripe_unit'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_ceph_stripe_unit', self.parameters['backup_ceph_stripe_unit'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s  backup_ceph_stripe_count %s" % \
-              ("DEFAULT", self.parameters['backup_ceph_stripe_count'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_ceph_stripe_count', self.parameters['backup_ceph_stripe_count'])
 
-        cmd = "crudini --set /etc/cinder/cinder.conf %s restore_discard_excess_bytes %s" % \
-              ("DEFAULT", self.parameters['restore_discard_excess_bytes'])
-        self.run_bash_command(cmd)
-
-        self.close_ssh_connection()
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'restore_discard_excess_bytes',
+                           self.parameters['restore_discard_excess_bytes'])
 
         print "The Cinder-Backup configuration is set"
 
@@ -463,47 +438,33 @@ class NovaHost(Host):
         print "Libvirt secret value has been set"
 
     def set_user_setting(self):
-        self.open_ssh_connection()
 
-        cmd = "crudini --set /etc/nova/nova.conf %s rbd_user %s-cinder" % \
-              ("libvirt", self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'rbd_user', '%s-' % self.parameters['user'] + 'cinder')
 
-        cmd = "crudini --set /etc/nova/nova.conf %s rbd_secret_uuid %s" % \
-              ("libvirt", self.parameters['uuid'])
-        self.run_bash_command(cmd)
-
-        self.close_ssh_connection()
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'rbd_secret_uuid', self.parameters['uuid'])
 
     def set_nova_conf(self):
-        self.open_ssh_connection()
 
-        cmd = "crudini --set /etc/nova/nova.conf %s images_type %s" % \
-              ("libvirt", self.parameters['images_type'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'images_type', self.parameters['images_type'])
 
-        cmd = "crudini --set /etc/nova/nova.conf %s images_rbd_pool %s-nova" % \
-              ("libvirt", self.parameters['user'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'images_rbd_pool', '%s-' % self.parameters['user'] + 'nova')
 
-        cmd = "crudini --set /etc/nova/nova.conf %s images_rbd_ceph_conf %s" % \
-              ("libvirt", self.parameters['ceph.conf path'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'images_rbd_ceph_conf', self.parameters['ceph.conf path'])
 
-        cmd = "crudini --set /etc/nova/nova.conf %s inject_password %s" % \
-              ("libvirt", self.parameters['inject_password'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'inject_password', self.parameters['inject_password'])
 
-        cmd = "crudini --set /etc/nova/nova.conf %s inject_key %s" % \
-              ("libvirt", self.parameters['inject_key'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'inject_key', self.parameters['inject_key'])
 
-        cmd = "crudini --set /etc/nova/nova.conf %s inject_partition %s" % \
-              ("libvirt", self.parameters['inject_partition'])
-        self.run_bash_command(cmd)
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'inject_partition', self.parameters['inject_partition'])
 
-        cmd = "crudini --set /etc/nova/nova.conf %s live_migration_flag %s" % \
-              ("libvirt", self.parameters['live_migration_flag'])
-        self.run_bash_command(cmd)
-
-        self.close_ssh_connection()
+        self.set_parameter(self.parameters['conf_path'], 'libvirt',
+                           'live_migration_flag',
+                           '\"%s\"' % self.parameters['live_migration_flag'])
