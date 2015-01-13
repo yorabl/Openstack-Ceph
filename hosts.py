@@ -240,13 +240,19 @@ class GlanceHost(Host):
                            'rbd_store_pool', '%s' % self.parameters['user'] + '-glance')
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'rbd_store_user', '%s' % self.parameters['user'] + '-glance')
+
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
                            'rbd_store_ceph_conf', self.parameters['ceph.conf path'])
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
-                           'rbd_store_chunk_size', self.parameters['rbd_store_chunk_size'])
+                           'rbd_store_chunk_size', self.parameters['chunk_size'])
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
                            'stores', "\" %s \"" % self.parameters['stores'])
+
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
+                           'store', "\" %s \"" % self.parameters['store'])
 
         print "The Glance configuration has been changed"
 
@@ -254,6 +260,7 @@ class GlanceHost(Host):
 class CinderHost(Host):
     def __init__(self, params, hostname):
         Host.__init__(self, params, hostname)
+        self.parameters['conf_path'] = params.get('CINDER', 'conf_file')
         self.parameters['backend_name'] = params.get('CINDER', 'backend_name')
         self.parameters['driver'] = params.get('CINDER', 'driver')
         self.parameters['rbd_flatten_volume_from_snapshot'] = params.get('CINDER', 'rbd_flatten_volume_from_snapshot')
@@ -331,6 +338,7 @@ class CinderHost(Host):
 class CinderBackupHost(Host):
     def __init__(self, params, hostname):
         Host.__init__(self, params, hostname)
+        self.parameters['conf_path'] = params.get('CINDER-BACKUP', 'conf_file')
         self.parameters['backup_driver'] = params.get('CINDER-BACKUP', 'backup_driver')
         self.parameters['backup_ceph_chunk_size'] = params.get('CINDER-BACKUP', 'backup_ceph_chunk_size')
         self.parameters['backup_ceph_stripe_unit'] = params.get('CINDER-BACKUP', 'backup_ceph_stripe_unit')
@@ -367,6 +375,9 @@ class CinderBackupHost(Host):
                            'backup_driver', self.parameters['backup_driver'])
 
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_ceph_pool', '%s-' % self.parameters['user'] + 'cinder-backup')
+
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
                            'backup_ceph_chunk_size', self.parameters['backup_ceph_chunk_size'])
 
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
@@ -378,6 +389,8 @@ class CinderBackupHost(Host):
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
                            'restore_discard_excess_bytes',
                            self.parameters['restore_discard_excess_bytes'])
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'backup_ceph_user', '%s-' % self.parameters['user'] + 'cinder-backup')
 
         print "The Cinder-Backup configuration is set"
 
@@ -385,6 +398,7 @@ class CinderBackupHost(Host):
 class NovaHost(Host):
     def __init__(self, params, hostname):
         Host.__init__(self, params, hostname)
+        self.parameters['conf_path'] = params.get('NOVA', 'conf_file')
         self.parameters['images_type'] = params.get('NOVA', 'images_type')
         self.parameters['inject_password'] = params.get('NOVA', 'inject_password')
         self.parameters['inject_key'] = params.get('NOVA', 'inject_key')

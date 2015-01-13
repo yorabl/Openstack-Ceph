@@ -1,5 +1,5 @@
 __author__ = 'yrabl'
-
+#! /usr/bin/python
 from hosts import CephHost
 from hosts import CinderBackupHost
 from hosts import CinderHost
@@ -14,12 +14,19 @@ if __name__ == "__main__":
     delete_pools = '--delete-pools' in argv
     reset_pools = '--reset-pools' in argv
 
+    if "help" in argv:
+        utils.print_help()
+
+    if delete_pools and reset_pools:
+        print "Unable to delete and reset the pools"
+        utils.print_help()
+
     params = utils.get_config(argv[1])
     ceph_host = utils.check_ceph_host(params)
 
     Ceph = CephHost(params, ceph_host[0])
     if delete_pools:
-        # set-ceph --delete-pools [COMPONENTS]
+
         roles = argv[3:]
         Ceph.delete_pools(roles)
         exit()
