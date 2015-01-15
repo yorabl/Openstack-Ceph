@@ -405,6 +405,7 @@ class NovaHost(Host):
         self.parameters['inject_key'] = params.get('NOVA', 'inject_key')
         self.parameters['inject_partition'] = params.get('NOVA', 'inject_partition')
         self.parameters['live_migration_flag'] = params.get('NOVA', 'live_migration_flag')
+        self.parameters['allow_resize_to_same_host'] = params.get('NOVA', 'allow_resize_to_same_host')
         self.parameters['secret_xml'] = "<secret ephemeral='no' private='no'>\n\t" \
                                         "<uuid>%s</uuid>\n\t" \
                                         "<usage type='ceph'>\n\t\t" \
@@ -462,6 +463,9 @@ class NovaHost(Host):
                            'rbd_secret_uuid', self.parameters['uuid'])
 
     def set_nova_conf(self):
+
+        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+                           'allow_resize_to_same_host', self.parameters['allow_resize_to_same_host'])
 
         self.set_parameter(self.parameters['conf_path'], 'libvirt',
                            'images_type', self.parameters['images_type'])
