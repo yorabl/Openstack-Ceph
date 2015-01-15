@@ -82,6 +82,7 @@ class CephHost(Host):
 
                 cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
                       (self.parameters['user'], component, self.parameters['user'], component)
+
                 self.run_bash_command(cmd)
 
                 print "%s-%s has been deleted" % (self.parameters['user'], component)
