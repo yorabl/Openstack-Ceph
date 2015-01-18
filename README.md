@@ -1,7 +1,8 @@
 Overview
 ---------
-
 This little tool connects to each server and set it up according to its role.
+All the hosts configuration and other settings are in the config.ini, to change them edit the file.
+
 The Ceph role:
 (1) Connecting to the Ceph server
 (2) Creating the pools
