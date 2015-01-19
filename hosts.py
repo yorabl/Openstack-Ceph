@@ -309,6 +309,8 @@ class CinderHost(Host):
                            'volume_driver', self.parameters['driver'])
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
+                           'volume_backend_name', self.parameters['backend_name'])
+        self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
                            'rbd_pool', '%s-' % (self.parameters['user']) + 'cinder')
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],

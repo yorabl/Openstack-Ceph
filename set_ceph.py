@@ -25,6 +25,7 @@ if __name__ == "__main__":
     ceph_host = utils.check_ceph_host(params)
 
     Ceph = CephHost(params, ceph_host[0])
+
     if delete_pools:
 
         roles = argv[3:]
