@@ -35,6 +35,7 @@ if __name__ == "__main__":
     if reset_pools:
         roles = argv[3:]
         Ceph.reset_pools(roles)
+        exit()
 
     Ceph.create_pools()
 
@@ -71,7 +72,7 @@ if __name__ == "__main__":
             nova_hosts = utils.find_host_role(params, 'nova')
 
             for node in nova_hosts:
-                print node
+
                 Nova = NovaHost(params, node)
 
                 Nova.set_libvirt_secret(Ceph)
