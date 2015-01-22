@@ -15,8 +15,9 @@ def find_host_role(params, role):
 
     for host in params.get('DEFAULT', 'host_names').split("," " "):
 
-        if (params.get(host, 'role')) == role:
+        if role in (params.get(host, 'role')):
             hosts.append(host)
+
     return hosts
 
 
