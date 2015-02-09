@@ -297,6 +297,20 @@ class CinderHost(Host):
         self.close_ssh_connection()
         print "The Ceph configuration file has been set"
 
+    #def set_type(self):
+        #self.open_ssh_connection()
+
+        #cmd = "cinder --os-username %s --os-password %s type-create %s" % \
+        #      (self.parameters['os_user'], self.parameters['os_password'], self.parameters['backend_name'])
+        #self.run_bash_command(cmd)
+
+        #cmd = "cinder --os-username %s --os-password %s type-key %s set volume_backend_name = %s" % \
+        #      (self.parameters['os_user'], self.parameters['os_password'],
+        #       self.parameters['backend_name'], self.parameters['backend_name'])
+        #self.run_bash_command(cmd)
+
+        #self.close_ssh_connection()
+
     def set_cinder_conf(self):
 
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
@@ -309,7 +323,9 @@ class CinderHost(Host):
                            'volume_driver', self.parameters['driver'])
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
-                           'volume_backend_name', self.parameters['backend_name'])
+                           'volume_backend_name',
+                           '%s-%s' % (self.parameters['user'], self.parameters['backend_name']))
+
         self.set_parameter(self.parameters['conf_path'], self.parameters['backend_name'],
                            'rbd_pool', '%s-' % (self.parameters['user']) + 'cinder')
 
