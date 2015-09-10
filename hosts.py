@@ -46,7 +46,7 @@ class Host(object):
     def reset_services(self, component):
         self.open_ssh_connection()
 
-        cmd = "openstack-service restart %s" % component
+        cmd = "for daemon in `systemctl -a | grep openstack-%s | awk '{ print$2 }'`; do systemctl restart $daemon; done" % component
         self.run_bash_command(cmd)
 
         self.close_ssh_connection()
