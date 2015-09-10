@@ -5,7 +5,6 @@
     <inspection_tool class="PyPep8Inspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoreOverriddenFunctions" value="false" />
-      <option name="ignoreTestFunctions" value="false" />
     </inspection_tool>
   </profile>
 </component>

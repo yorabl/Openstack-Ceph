@@ -13,6 +13,8 @@ if __name__ == "__main__":
 
     delete_pools = '--delete-pools' in argv
     reset_pools = '--reset-pools' in argv
+    create_pools = '--create-pools' in argv
+    create_keyrings = '--create-keyrings' in argv
 
     if "help" in argv:
         utils.print_help()
@@ -35,6 +37,14 @@ if __name__ == "__main__":
     if reset_pools:
         roles = argv[3:]
         Ceph.reset_pools(roles)
+        exit()
+
+    if create_pools:
+        Ceph.create_pools()
+        exit()
+
+    if create_keyrings:
+        Ceph.create_client()
         exit()
 
     Ceph.create_pools()

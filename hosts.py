@@ -80,7 +80,7 @@ class CephHost(Host):
 
             for component in components:
 
-                cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
+                cmd = "sudo ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
                       (self.parameters['user'], component, self.parameters['user'], component)
 
                 self.run_bash_command(cmd)
@@ -89,7 +89,7 @@ class CephHost(Host):
         else:
             for role in roles:
 
-                cmd = "ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
+                cmd = "sudo ceph osd pool delete %s-%s %s-%s --yes-i-really-really-mean-it" % \
                     (self.parameters['user'], role, self.parameters['user'], role)
                 self.run_bash_command(cmd)
 
@@ -106,7 +106,7 @@ class CephHost(Host):
 
         for component in self.pools:
             if self.pools[component] == 'y':
-                cmd = "ceph osd pool create %s-%s %s" % \
+                cmd = "sudo ceph osd pool create %s-%s %s" % \
                       (self.parameters['user'], component, self.parameters['pg_num'])
                 self.run_bash_command(cmd)
 
@@ -119,7 +119,7 @@ class CephHost(Host):
 
         self.open_ssh_connection()
         if component == "cinder":
-            cmd = "ceph auth get-or-create client.%s-cinder mon 'allow r' osd 'allow class-read " \
+            cmd = "sudo ceph auth get-or-create client.%s-cinder mon 'allow r' osd 'allow class-read " \
                   "object_prefix rbd_children," \
                   "allow rwx pool=%s-cinder, " \
                   "allow rwx pool=%s-nova , " \
@@ -133,7 +133,7 @@ class CephHost(Host):
                   self.parameters['user']
 
         if component == 'glance':
-            cmd = "ceph auth get-or-create client.%s-glance mon 'allow r' osd " \
+            cmd = "sudo ceph auth get-or-create client.%s-glance mon 'allow r' osd " \
                   "'allow class-read object_prefix rbd_children, allow rwx pool=%s-glance'" % \
                   (self.parameters['user'], self.parameters['user'])
             self.run_bash_command(cmd)
@@ -141,7 +141,7 @@ class CephHost(Host):
                   self.parameters['user']
 
         if component == "cinder-backup":
-            cmd = "ceph auth get-or-create client.%s-cinder-backup mon 'allow r' osd 'allow class-read " \
+            cmd = "sudo ceph auth get-or-create client.%s-cinder-backup mon 'allow r' osd 'allow class-read " \
                   "object_prefix rbd_children, allow rwx pool=%s-cinder-backup'" % \
                   (self.parameters['user'], self.parameters['user'])
             self.run_bash_command(cmd)
@@ -153,7 +153,7 @@ class CephHost(Host):
     def get_keyring(self, component):
         self.open_ssh_connection()
 
-        cmd = "ceph auth get client.%s-%s" % (self.parameters['user'], component)
+        cmd = "sudo ceph auth get client.%s-%s" % (self.parameters['user'], component)
         keyring = self.run_bash_command(cmd)
 
         self.close_ssh_connection()
@@ -162,7 +162,7 @@ class CephHost(Host):
     def get_key(self, component):
         self.open_ssh_connection()
 
-        cmd = "ceph auth get-key client.%s-%s" % (self.parameters['user'], component)
+        cmd = "sudo ceph auth get-key client.%s-%s" % (self.parameters['user'], component)
         key = self.run_bash_command(cmd)
 
         self.close_ssh_connection()
@@ -171,7 +171,7 @@ class CephHost(Host):
     def get_ceph_conf(self):
         self.open_ssh_connection()
 
-        cmd = "cat %s" % self.parameters['ceph.conf path']
+        cmd = "sudo cat %s" % self.parameters['ceph.conf path']
         conf = self.run_bash_command(cmd)
 
         self.close_ssh_connection()
@@ -222,7 +222,7 @@ class GlanceHost(Host):
 
     def set_glance_conf(self):
 
-        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
                            'default_store', self.parameters['store'])
 
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
@@ -251,9 +251,6 @@ class GlanceHost(Host):
 
         self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
                            'stores', "\" %s \"" % self.parameters['stores'])
-
-        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
-                           'store', "\" %s \"" % self.parameters['store'])
 
         print "The Glance configuration has been changed"
 
