@@ -222,7 +222,7 @@ class GlanceHost(Host):
 
     def set_glance_conf(self):
 
-        self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
+        self.set_parameter(self.parameters['conf_path'], self.parameters['section'],
                            'default_store', self.parameters['store'])
 
         self.set_parameter(self.parameters['conf_path'], 'DEFAULT',
@@ -503,6 +503,4 @@ class NovaHost(Host):
         self.set_parameter(self.parameters['conf_path'], 'libvirt',
                            'live_migration_flag',
                            '\"%s\"' % self.parameters['live_migration_flag'])
-        self.set_parameter(self.parameters['conf_path'], 'libvirt'
-                           'hw_disk_discard', self.parameters['hw_disk_discard'])
 
